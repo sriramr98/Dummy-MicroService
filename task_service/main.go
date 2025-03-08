@@ -74,7 +74,7 @@ func initPG(env GetEnvFunc) *sql.DB {
 func NewServer(service services.TaskService) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /task", utils.ErrorHandler(controllers.CreateTask(service)))
-	mux.HandleFunc("GET /tasks", utils.ErrorHandler(controllers.ListTasks(service)))
+	mux.HandleFunc("GET /task", utils.ErrorHandler(controllers.ListTasks(service)))
 	mux.HandleFunc("GET /task/{id}", utils.ErrorHandler(controllers.GetTask(service)))
 	mux.HandleFunc("PATCH /task/{id}", utils.ErrorHandler(controllers.UpdateTask(service)))
 	mux.HandleFunc("DELETE /task/{id}", utils.ErrorHandler(controllers.DeleteTask(service)))

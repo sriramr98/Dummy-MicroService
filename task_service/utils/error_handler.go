@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -22,16 +21,7 @@ func ErrorHandler(handler ApiHandler) http.HandlerFunc {
 				}
 			}
 
-			writeErrorResponse(w, apiErr)
+			WriteErrorResponse(w, apiErr)
 		}
-	}
-}
-
-func writeErrorResponse(w http.ResponseWriter, apiErr ApplicationError) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(apiErr.HttpStatusCode())
-
-	if err := json.NewEncoder(w).Encode(apiErr.ErrMap()); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

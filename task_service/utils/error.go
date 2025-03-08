@@ -34,6 +34,7 @@ func (e ApiError) ErrMap() map[string]interface{} {
 	return map[string]interface{}{
 		"code":    e.Code,
 		"message": e.Message,
+		"success": false,
 	}
 }
 
@@ -47,8 +48,9 @@ func (e ValidationError) Error() string {
 
 func (e ValidationError) ErrMap() map[string]interface{} {
 	return map[string]interface{}{
-		"code":   e.Code,
-		"errors": e.Errors,
+		"code":    e.Code,
+		"errors":  e.Errors,
+		"success": false,
 	}
 }
 
