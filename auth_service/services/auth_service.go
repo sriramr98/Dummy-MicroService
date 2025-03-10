@@ -63,3 +63,31 @@ func (as AuthService) GetUserInfo(id int64) (User, error) {
 	err := as.db.QueryRow("SELECT id, email, password, blocked FROM users WHERE id = $1", id).Scan(&user.ID, &user.Email, &user.Password, &user.Blocked)
 	return user, err
 }
+
+func (as AuthService) BlockUser(userId int64) bool {
+	res, err := as.db.Exec("UPDATE users SET blocked = true WHERE id = $1", userId)
+	if err != nil {
+		return false
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return false
+	}
+
+	return rowsAffected > 0
+}
+
+func (as AuthService) UnBlockUser(userId int64) bool {
+	res, err := as.db.Exec("UPDATE users SET blocked = false WHERE id = $1", userId)
+	if err != nil {
+		return false
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return false
+	}
+
+	return rowsAffected > 0
+}

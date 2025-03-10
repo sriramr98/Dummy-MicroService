@@ -10,6 +10,7 @@ var (
 	ErrUserExists            = ApiErrorCode(1002)
 	ErrInvalidPassword       = ApiErrorCode(1003)
 	ErrUserNotFound          = ApiErrorCode(1004)
+	ErrUnauthorized          = ApiErrorCode(1005)
 )
 
 type ApplicationError interface {

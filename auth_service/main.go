@@ -84,6 +84,8 @@ func NewServer(authService services.AuthService) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /login", utils.ErrorHandler(controllers.LoginHandler(authService)))
 	mux.HandleFunc("POST /register", utils.ErrorHandler(controllers.RegisterHandler(authService)))
+	mux.HandleFunc("POST /block/{userId}", utils.ErrorHandler(controllers.BlockUserHandler(authService)))
+	mux.HandleFunc("POST /unblock/{userId}", utils.ErrorHandler(controllers.UnBlockUserHandler(authService)))
 	return mux
 }
 
