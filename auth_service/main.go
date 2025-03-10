@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"github.com/sriramr98/todo_auth_service/controllers"
 	"github.com/sriramr98/todo_auth_service/services"
 	"github.com/sriramr98/todo_auth_service/utils"
@@ -47,7 +48,7 @@ func run(ctx context.Context) error {
 	srv := NewServer(authService)
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%s", os.Getenv("PORT")),
-		Handler: srv,
+		Handler: cors.Default().Handler(srv),
 	}
 
 	grpcServer, tcpLn := GetGRPCServer(authService)

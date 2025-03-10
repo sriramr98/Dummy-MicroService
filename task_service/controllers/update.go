@@ -9,6 +9,12 @@ import (
 	"strconv"
 )
 
+type updateTaskPayload struct {
+	Title     string `json:"title"`
+	Body      string `json:"body"`
+	Completed bool   `json:"completed"`
+}
+
 func UpdateTask(taskService services.TaskService) utils.ApiHandler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		idStr := r.PathValue("id")
@@ -24,7 +30,7 @@ func UpdateTask(taskService services.TaskService) utils.ApiHandler {
 		}
 
 		decoder := json.NewDecoder(r.Body)
-		var taskBody createTaskPayload
+		var taskBody updateTaskPayload
 
 		if err := decoder.Decode(&taskBody); err != nil {
 			return utils.ApiError{
@@ -34,7 +40,7 @@ func UpdateTask(taskService services.TaskService) utils.ApiHandler {
 			}
 		}
 
-		err = taskService.UpdateTask(int64(id), taskBody.Title, taskBody.Body, userId)
+		err = taskService.UpdateTask(int64(id), taskBody.Title, taskBody.Body, taskBody.Completed, userId)
 
 		if err != nil {
 			log.Println(err)

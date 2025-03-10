@@ -10,9 +10,10 @@ type TaskService struct {
 }
 
 type Task struct {
-	Id    int64
-	Title string
-	Body  string
+	Id        int64  `json:"id"`
+	Title     string `json:"title"`
+	Body      string `json:"body"`
+	Completed bool   `json:"completed"`
 }
 
 func NewTaskService(db *sql.DB) TaskService {
@@ -25,19 +26,19 @@ func (ts TaskService) CreateTask(title, body string, userId int64) (int64, error
 	return id, err
 }
 
-func (ts TaskService) UpdateTask(id int64, title, body string, userId int64) error {
-	_, err := ts.db.Exec("UPDATE tasks SET title = $1, body = $2 WHERE id = $3 AND userId = $4", title, body, id, userId)
+func (ts TaskService) UpdateTask(id int64, title, body string, completed bool, userId int64) error {
+	_, err := ts.db.Exec("UPDATE tasks SET title = $1, body = $2, completed = $3 WHERE id = $4 AND userId = $5", title, body, completed, id, userId)
 	return err
 }
 
 func (ts TaskService) GetTask(id int64, userId int64) (Task, error) {
 	var task Task
-	err := ts.db.QueryRow("SELECT id, title, body FROM tasks WHERE id = $1 AND userId = $2", id, userId).Scan(&task.Id, &task.Title, &task.Body)
+	err := ts.db.QueryRow("SELECT id, title, body, completed FROM tasks WHERE id = $1 AND userId = $2", id, userId).Scan(&task.Id, &task.Title, &task.Body, &task.Completed)
 	return task, err
 }
 
 func (ts TaskService) ListTasks(userId int64) ([]Task, error) {
-	rows, err := ts.db.Query("SELECT id, title, body FROM tasks WHERE userId = $1", userId)
+	rows, err := ts.db.Query("SELECT id, title, body, completed FROM tasks WHERE userId = $1", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func (ts TaskService) ListTasks(userId int64) ([]Task, error) {
 	tasks := make([]Task, 0)
 	for rows.Next() {
 		var task Task
-		if err := rows.Scan(&task.Id, &task.Title, &task.Body); err != nil {
+		if err := rows.Scan(&task.Id, &task.Title, &task.Body, &task.Completed); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)

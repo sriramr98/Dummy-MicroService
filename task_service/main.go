@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"github.com/sriramr98/todo_task_service/controllers"
 	"github.com/sriramr98/todo_task_service/services"
 	"github.com/sriramr98/todo_task_service/utils"
@@ -43,9 +44,10 @@ func run(ctx context.Context) error {
 	taskService := services.NewTaskService(pg)
 
 	srv := NewServer(taskService)
+
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%s", os.Getenv("PORT")),
-		Handler: srv,
+		Handler: cors.AllowAll().Handler(srv),
 	}
 
 	go runServer(httpServer)
