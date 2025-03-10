@@ -30,6 +30,9 @@ func (c createTaskPayload) Validate() map[string]string {
 
 func CreateTask(taskService services.TaskService) utils.ApiHandler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+
+		userId := r.Context().Value("userId").(int64)
+
 		decoder := json.NewDecoder(r.Body)
 		var taskBody createTaskPayload
 
@@ -49,7 +52,7 @@ func CreateTask(taskService services.TaskService) utils.ApiHandler {
 			}
 		}
 
-		id, err := taskService.CreateTask(taskBody.Title, taskBody.Body)
+		id, err := taskService.CreateTask(taskBody.Title, taskBody.Body, userId)
 
 		if err != nil {
 			log.Println(err)

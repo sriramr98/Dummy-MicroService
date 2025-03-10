@@ -13,6 +13,8 @@ func UpdateTask(taskService services.TaskService) utils.ApiHandler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
+
+		userId := r.Context().Value("userId").(int64)
 		if err != nil {
 			return utils.ApiError{
 				StatusCode: http.StatusBadRequest,
@@ -32,7 +34,7 @@ func UpdateTask(taskService services.TaskService) utils.ApiHandler {
 			}
 		}
 
-		err = taskService.UpdateTask(int64(id), taskBody.Title, taskBody.Body)
+		err = taskService.UpdateTask(int64(id), taskBody.Title, taskBody.Body, userId)
 
 		if err != nil {
 			log.Println(err)

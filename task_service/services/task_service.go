@@ -19,25 +19,25 @@ func NewTaskService(db *sql.DB) TaskService {
 	return TaskService{db: db}
 }
 
-func (ts TaskService) CreateTask(title, body string) (int64, error) {
+func (ts TaskService) CreateTask(title, body string, userId int64) (int64, error) {
 	var id int64
-	err := ts.db.QueryRow("INSERT INTO tasks (title, body) VALUES ($1, $2) RETURNING id", title, body).Scan(&id)
+	err := ts.db.QueryRow("INSERT INTO tasks (title, body, userId) VALUES ($1, $2, $3) RETURNING id", title, body, userId).Scan(&id)
 	return id, err
 }
 
-func (ts TaskService) UpdateTask(id int64, title, body string) error {
-	_, err := ts.db.Exec("UPDATE tasks SET title = $1, body = $2 WHERE id = $3", title, body, id)
+func (ts TaskService) UpdateTask(id int64, title, body string, userId int64) error {
+	_, err := ts.db.Exec("UPDATE tasks SET title = $1, body = $2 WHERE id = $3 AND userId = $4", title, body, id, userId)
 	return err
 }
 
-func (ts TaskService) GetTask(id int64) (Task, error) {
+func (ts TaskService) GetTask(id int64, userId int64) (Task, error) {
 	var task Task
-	err := ts.db.QueryRow("SELECT id, title, body FROM tasks WHERE id = $1", id).Scan(&task.Id, &task.Title, &task.Body)
+	err := ts.db.QueryRow("SELECT id, title, body FROM tasks WHERE id = $1 AND userId = $2", id, userId).Scan(&task.Id, &task.Title, &task.Body)
 	return task, err
 }
 
-func (ts TaskService) ListTasks() ([]Task, error) {
-	rows, err := ts.db.Query("SELECT id, title, body FROM tasks")
+func (ts TaskService) ListTasks(userId int64) ([]Task, error) {
+	rows, err := ts.db.Query("SELECT id, title, body FROM tasks WHERE userId = $1", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (ts TaskService) ListTasks() ([]Task, error) {
 	return tasks, nil
 }
 
-func (ts TaskService) DeleteTask(id int) error {
-	_, err := ts.db.Exec("DELETE FROM tasks WHERE id = $1", id)
+func (ts TaskService) DeleteTask(id int, userId int64) error {
+	_, err := ts.db.Exec("DELETE FROM tasks WHERE id = $1 AND userId = $2", id, userId)
 	return err
 }

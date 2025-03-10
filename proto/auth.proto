@@ -1,0 +1,19 @@
+syntax="proto3";
+
+package main;
+
+option go_package = "./services";
+
+service AuthService {
+  rpc GetUserInfo(UserRequest) returns (UserInfo) {};
+}
+
+message UserRequest {
+  string token = 1;
+}
+
+message UserInfo {
+   string email = 1;
+   bool blocked = 2;
+   int64 userId = 3;
+}

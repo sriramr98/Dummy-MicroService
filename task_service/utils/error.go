@@ -7,6 +7,7 @@ type ApiErrorCode int
 var (
 	ErrInvalidRequestPayload = ApiErrorCode(1000)
 	ErrInternalServer        = ApiErrorCode(1001)
+	ErrUnauthorized          = ApiErrorCode(1002)
 )
 
 type ApplicationError interface {

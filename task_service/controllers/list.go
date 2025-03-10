@@ -8,7 +8,9 @@ import (
 
 func ListTasks(taskService services.TaskService) utils.ApiHandler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		tasks, err := taskService.ListTasks()
+		userId := r.Context().Value("userId").(int64)
+
+		tasks, err := taskService.ListTasks(userId)
 		if err != nil {
 			return utils.ApiError{
 				StatusCode: http.StatusInternalServerError,

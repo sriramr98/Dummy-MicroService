@@ -17,8 +17,6 @@ import (
 	"time"
 )
 
-type GetEnvFunc func(string) string
-
 func main() {
 
 	if err := godotenv.Load(); err != nil {
@@ -27,14 +25,14 @@ func main() {
 	}
 
 	ctx := context.Background()
-	if err := run(ctx, os.Getenv); err != nil {
+	if err := run(ctx); err != nil {
 		log.Printf("Error running server: %v", err)
 		os.Exit(1)
 	}
 }
 
-func run(ctx context.Context, getEnv GetEnvFunc) error {
-	pg := initPG(getEnv)
+func run(ctx context.Context) error {
+	pg := initPG()
 	defer func(pg *sql.DB) {
 		err := pg.Close()
 		if err != nil {
@@ -46,7 +44,7 @@ func run(ctx context.Context, getEnv GetEnvFunc) error {
 
 	srv := NewServer(taskService)
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%s", getEnv("PORT")),
+		Addr:    fmt.Sprintf(":%s", os.Getenv("PORT")),
 		Handler: srv,
 	}
 
@@ -62,22 +60,22 @@ func run(ctx context.Context, getEnv GetEnvFunc) error {
 	return nil
 }
 
-func initPG(env GetEnvFunc) *sql.DB {
-	host := env("PG_HOST")
-	user := env("PG_USER")
-	password := env("PG_PASSWORD")
-	dbname := env("PG_DBNAME")
+func initPG() *sql.DB {
+	host := os.Getenv("PG_HOST")
+	user := os.Getenv("PG_USER")
+	password := os.Getenv("PG_PASSWORD")
+	dbname := os.Getenv("PG_DBNAME")
 
 	return InitDB(host, user, password, dbname)
 }
 
 func NewServer(service services.TaskService) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /task", utils.ErrorHandler(controllers.CreateTask(service)))
-	mux.HandleFunc("GET /task", utils.ErrorHandler(controllers.ListTasks(service)))
-	mux.HandleFunc("GET /task/{id}", utils.ErrorHandler(controllers.GetTask(service)))
-	mux.HandleFunc("PATCH /task/{id}", utils.ErrorHandler(controllers.UpdateTask(service)))
-	mux.HandleFunc("DELETE /task/{id}", utils.ErrorHandler(controllers.DeleteTask(service)))
+	mux.HandleFunc("POST /task", utils.ErrorHandler(utils.AuthHandler(controllers.CreateTask(service))))
+	mux.HandleFunc("GET /task", utils.ErrorHandler(utils.AuthHandler(controllers.ListTasks(service))))
+	mux.HandleFunc("GET /task/{id}", utils.ErrorHandler(utils.AuthHandler(controllers.GetTask(service))))
+	mux.HandleFunc("PATCH /task/{id}", utils.ErrorHandler(utils.AuthHandler(controllers.UpdateTask(service))))
+	mux.HandleFunc("DELETE /task/{id}", utils.ErrorHandler(utils.AuthHandler(controllers.DeleteTask(service))))
 	return mux
 }
 

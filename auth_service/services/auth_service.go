@@ -37,7 +37,7 @@ func NewAuthService(db *sql.DB) AuthService {
 }
 
 func (as AuthService) CreateNewUser(email string, password string) (User, error) {
-	_, err := as.GetUserInfo(email)
+	_, err := as.GetUserInfoByEmail(email)
 	if err == nil {
 		// User already exists
 		return User{}, ErrUserExists
@@ -52,8 +52,14 @@ func (as AuthService) CreateNewUser(email string, password string) (User, error)
 	return user, err
 }
 
-func (as AuthService) GetUserInfo(email string) (User, error) {
+func (as AuthService) GetUserInfoByEmail(email string) (User, error) {
 	var user User
 	err := as.db.QueryRow("SELECT id, email, password, blocked FROM users WHERE email = $1", email).Scan(&user.ID, &user.Email, &user.Password, &user.Blocked)
+	return user, err
+}
+
+func (as AuthService) GetUserInfo(id int64) (User, error) {
+	var user User
+	err := as.db.QueryRow("SELECT id, email, password, blocked FROM users WHERE id = $1", id).Scan(&user.ID, &user.Email, &user.Password, &user.Blocked)
 	return user, err
 }

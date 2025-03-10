@@ -7,6 +7,7 @@ import (
 	"github.com/sriramr98/todo_auth_service/utils"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -49,7 +50,7 @@ func LoginHandler(authService services.AuthService) utils.ApiHandler {
 			}
 		}
 
-		userInfo, err := authService.GetUserInfo(loginBody.Email)
+		userInfo, err := authService.GetUserInfoByEmail(loginBody.Email)
 		if err != nil {
 			return utils.ApiError{
 				StatusCode: http.StatusBadRequest,
@@ -86,7 +87,7 @@ func createJWTToken(userInfo services.User) (string, error) {
 	hmacSampleSecret := []byte(secret)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userInfo.ID,
+		"sub": strconv.Itoa(userInfo.ID),
 		"iss": "todo_app",
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 		"iat": time.Now().Unix(),

@@ -11,6 +11,8 @@ func GetTask(taskService services.TaskService) utils.ApiHandler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
+
+		userId := r.Context().Value("userId").(int64)
 		if err != nil {
 			return utils.ApiError{
 				StatusCode: http.StatusBadRequest,
@@ -19,7 +21,7 @@ func GetTask(taskService services.TaskService) utils.ApiHandler {
 			}
 		}
 
-		task, err := taskService.GetTask(int64(id))
+		task, err := taskService.GetTask(int64(id), userId)
 		if err != nil {
 			return utils.ApiError{
 				StatusCode: http.StatusInternalServerError,

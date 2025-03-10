@@ -11,6 +11,8 @@ func DeleteTask(taskService services.TaskService) utils.ApiHandler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
+
+		userId := r.Context().Value("userId").(int64)
 		if err != nil {
 			return utils.ApiError{
 				StatusCode: http.StatusBadRequest,
@@ -19,7 +21,7 @@ func DeleteTask(taskService services.TaskService) utils.ApiHandler {
 			}
 		}
 
-		if err := taskService.DeleteTask(id); err != nil {
+		if err := taskService.DeleteTask(id, userId); err != nil {
 			return utils.ApiError{
 				StatusCode: http.StatusInternalServerError,
 				Code:       utils.ErrInternalServer,
