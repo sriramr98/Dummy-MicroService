@@ -69,7 +69,6 @@ func (asg AuthGrpcServer) GetUserInfo(ctx context.Context, ur *services.UserRequ
 	user, err := asg.authService.GetUserInfo(int64(userId))
 	if err != nil {
 		log.Println(err)
-		//TODO: Handle error
 		return &services.UserInfo{}, err
 	}
 

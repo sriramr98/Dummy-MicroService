@@ -1,1 +1,4 @@
 */.env
+task_service/bin
+auth_service/bin
+*.pem
